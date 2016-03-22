@@ -47,9 +47,6 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
   [self configureView];
-  
-  NSLog(@"Displaying Detail View");
-  NSLog(@"Priority:%@, Item:%@", self.priorityNumber.text, self.itemTitle.text);
 }
 
 - (void)didReceiveMemoryWarning {

@@ -32,6 +32,9 @@
     //Strike itemTitle and itemDescription
     [self strikeText:self.itemTitle];
     [self strikeText:self.itemDescription];
+    [self strikeText:self.priorityNumber];
+    
+    
   } else{
     [_statusImage setImage:[[UIImage alloc] init]];
   }

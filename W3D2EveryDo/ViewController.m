@@ -22,6 +22,7 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   // Do any additional setup after loading the view, typically from a nib.
+  [self configureTableView];
   [self addUIElements];
   [self setDelegate];
   [self buildData];
@@ -33,6 +34,9 @@
 }
 
 //MARK: Preparation
+-(void)configureTableView{
+}
+  
 -(void)addUIElements{
   //self.tableView.ed
   self.navigationItem.leftBarButtonItem  = self.editButtonItem;
@@ -45,7 +49,6 @@
   self.navigationItem.rightBarButtonItem = addButtonItem;
 }
 -(void)editTapped{
-  NSLog(@"Edit button tapped");
   [self.tableView setEditing:!self.tableView.editing animated:YES];
 //  [self.tableView set]
   if (self.tableView.editing) {
@@ -57,7 +60,6 @@
   //  self.tableView.editing = YES;
 }
 -(void)showAddView:(id)sender {
-  NSLog(@"Display add new item view");
   [self performSegueWithIdentifier:@"showAdd" sender:self];
 }
 -(void)setDelegate{
