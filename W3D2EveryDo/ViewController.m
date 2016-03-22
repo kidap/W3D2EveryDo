@@ -11,9 +11,10 @@
 #import "DetailViewController.h"
 #import "AddViewController.h"
 
-@interface ViewController ()<UITableViewDataSource, UITableViewDelegate>
+@interface ViewController ()<UITableViewDataSource, UITableViewDelegate,UIToolbarDelegate>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *toDoList;
+@property (strong, nonatomic) UISegmentedControl *sortingSegmentedControl;
 
 @end
 
@@ -43,11 +44,20 @@
 }
 
 -(void)addUIElements{
-  //self.tableView.ed
+
+  //Edit button
   self.navigationItem.leftBarButtonItem  = self.editButtonItem;
   self.editButtonItem.target = self;
   self.editButtonItem.action = @selector(editTapped);
   
+//  //Sorting options
+  self.sortingSegmentedControl = [[UISegmentedControl alloc] initWithItems:@[@"Importance",@"Urgency"]];
+  [self.sortingSegmentedControl setUserInteractionEnabled:YES];
+  [self.sortingSegmentedControl addTarget:self action:@selector(sortTable:) forControlEvents:UIControlEventValueChanged];
+  self.navigationItem.titleView = self.sortingSegmentedControl;
+
+  
+  //Add button
   UIBarButtonItem *addButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                  target:self
                                                                                  action:@selector(showAddView:)];
@@ -147,6 +157,7 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
   [self.toDoList removeObjectAtIndex:sourceIndexPath.row];
   [self.toDoList insertObject:item atIndex:destinationIndexPath.row];
 }
+
 //MARK: Data Array methods
 -(void)addItemWithTitle:(NSString *)itemTitle
          WithDescrition:(NSString *)itemDescription
@@ -199,6 +210,26 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
       return @"";
       break;
   }
+}
+-(void)sortTable:(id)sender{
+  NSLog(@"Sorting the array");
+  NSSortDescriptor *sortDescriptor;
+  switch (self.sortingSegmentedControl.selectedSegmentIndex) {
+    case 0:
+      
+      sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"priorityNumber" ascending:YES];
+      break;
+    case 1:
+      
+      sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"deadline" ascending:YES];
+      break;
+      
+    default:
+      break;
+  }
+  NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+  self.toDoList[0] = [self.toDoList[0] sortedArrayUsingDescriptors:sortDescriptors];
+  [self.tableView reloadData];
 }
 
 //MARK: Gestures
