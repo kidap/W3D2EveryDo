@@ -9,10 +9,11 @@
 #import "AddViewController.h"
 #import "ViewController.h"
 
-@interface AddViewController () <ToDoListDelegate>
+@interface AddViewController () <ToDoListDelegate,UITextFieldDelegate>
 @property (strong, nonatomic) IBOutlet UITextField *priority;
 @property (strong, nonatomic) IBOutlet UITextField *itemTitle;
 @property (strong, nonatomic) IBOutlet UITextField *itemdescription;
+@property (strong, nonatomic) IBOutlet UIDatePicker *datePicker;
 
 @end
 
@@ -23,6 +24,9 @@
   // Do any additional setup after loading the view.
   
   NSLog(@"Add View controller displayed");
+  self.itemTitle.delegate = self;
+  self.itemdescription.delegate  = self;
+  self.priority.delegate = self;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -36,7 +40,8 @@
   [self addItemWithTitle:self.itemTitle.text
           WithDescrition:self.itemdescription.text
             withPriority:self.priority.text
-              withStatus:NO];
+              withStatus:NO
+                withDate: self.datePicker.date];
   
   //Dismiss the view controller
   [self dismissViewControllerAnimated:YES completion:nil];
@@ -46,11 +51,18 @@
 -(void)addItemWithTitle:(NSString *)itemTitle
          WithDescrition:(NSString *)itemDescription
            withPriority:(NSString *)priority
-             withStatus:(bool)status;{
+             withStatus:(bool)status
+               withDate:(NSDate *)date;{
   [self.delegate addItemWithTitle:itemTitle
                    WithDescrition:itemDescription
                      withPriority:priority
-                       withStatus:status];
+                       withStatus:status
+                         withDate:date];
+}
+//MARK: TextField delegate
+-(BOOL)textFieldShouldReturn:(UITextField *)textField{
+  [textField resignFirstResponder];
+  return YES;
 }
 
 @end

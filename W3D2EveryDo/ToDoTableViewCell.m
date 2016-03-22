@@ -13,6 +13,12 @@
 - (void)awakeFromNib {
     // Initialization code
 }
+-(void)prepareForReuse{
+  self.itemTitle.text = @"";
+  self.itemDescription.text = @"";
+  self.priorityNumber.text = @"";
+  self.deadline.text = @"";
+}
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];

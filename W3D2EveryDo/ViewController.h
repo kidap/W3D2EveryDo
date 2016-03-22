@@ -13,7 +13,8 @@
 -(void)addItemWithTitle:(NSString *)itemTitle
          WithDescrition:(NSString *)itemDescription
            withPriority:(NSString *)priority
-             withStatus:(bool)status;
+             withStatus:(bool)status
+               withDate:(NSDate *)date;
 
 @end
 @interface ViewController : UIViewController

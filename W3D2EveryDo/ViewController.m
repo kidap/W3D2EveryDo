@@ -35,8 +35,13 @@
 
 //MARK: Preparation
 -(void)configureTableView{
+  UISwipeGestureRecognizer *swipToComplete = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                                                       action:@selector(swipeToComplete:)]
+  ;
+  swipToComplete.direction = UISwipeGestureRecognizerDirectionRight;
+  [self.tableView addGestureRecognizer:swipToComplete];
 }
-  
+
 -(void)addUIElements{
   //self.tableView.ed
   self.navigationItem.leftBarButtonItem  = self.editButtonItem;
@@ -50,14 +55,12 @@
 }
 -(void)editTapped{
   [self.tableView setEditing:!self.tableView.editing animated:YES];
-//  [self.tableView set]
+  //  [self.tableView set]
   if (self.tableView.editing) {
     [self.navigationItem.leftBarButtonItem setTitle:@"Done"];
   } else{
     [self.navigationItem.leftBarButtonItem setTitle:@"Edit"];
   }
-  
-  //  self.tableView.editing = YES;
 }
 -(void)showAddView:(id)sender {
   [self performSegueWithIdentifier:@"showAdd" sender:self];
@@ -69,46 +72,23 @@
 -(void)buildData{
   self.toDoList = [[NSMutableArray alloc] init];
   
-  [self addToDoToArrayWithTitle:@"buy milk"
-                 WithDescrition:@"Chocolate"
-                   withPriority:@"1"
-                     withStatus:YES];
+  [self addItemWithTitle:@"buy milk"
+          WithDescrition:@"Chocolate"
+            withPriority:@"1"
+              withStatus:NO
+                withDate:[NSDate date]];
   
-  [self addToDoToArrayWithTitle:@"Visit dentist"
-                 WithDescrition:@"Dr. Who"
-                   withPriority:@"6"
-                     withStatus:NO];
+  [self addItemWithTitle:@"Visit dentist"
+          WithDescrition:@"Dr. Who"
+            withPriority:@"6"
+              withStatus:NO
+                withDate:[NSDate date]];
   
-  [self addToDoToArrayWithTitle:@"Stand up every hour"
-                 WithDescrition:@"take care of you back"
-                   withPriority:@"1"
-                     withStatus:NO];
-}
-
--(void)addToDoToArrayWithTitle:(NSString *)itemTitle
-                WithDescrition:(NSString *)itemDescription
-                  withPriority:(NSString *)priority
-                    withStatus:(bool)status{
-  
-  NSMutableDictionary *toDoListRow = [[NSMutableDictionary alloc] init];
-  
-  [toDoListRow setObject:itemTitle forKey:@"itemTitle"];
-  [toDoListRow setObject:itemDescription forKey:@"itemDescription"];
-  [toDoListRow setObject:priority forKey:@"priorityNumber"];
-  [toDoListRow setObject:[NSNumber numberWithBool:status] forKey:@"status"];
-  [self.toDoList addObject:toDoListRow];
-  [self.tableView reloadData];
-}
-
--(void)addItemWithTitle:(NSString *)itemTitle
-         WithDescrition:(NSString *)itemDescription
-           withPriority:(NSString *)priority
-             withStatus:(bool)status{
-  [self addToDoToArrayWithTitle:itemTitle
-                 WithDescrition:itemDescription
-                   withPriority:priority
-                     withStatus:status];
-  
+  [self addItemWithTitle:@"Stand up every hour"
+          WithDescrition:@"take care of you back"
+            withPriority:@"1"
+              withStatus:NO
+                withDate:[NSDate date]];
 }
 
 //MARK: Table View delegate and data source
@@ -135,16 +115,18 @@
                                                                                  forIndexPath:indexPath];
   if (cell) {
     //Get the actual row item using the index path
-    NSMutableDictionary *toDoListRow = [[NSMutableDictionary alloc] init];
-    toDoListRow = (NSMutableDictionary *)self.toDoList[indexPath.row];
+    NSMutableDictionary *toDoListRow = (NSMutableDictionary *)self.toDoList[indexPath.row];
     
     //Set the cell values
     cell.priorityNumber.text = toDoListRow[@"priorityNumber"];
     cell.itemTitle.text = toDoListRow[@"itemTitle"];
     cell.itemDescription.text = toDoListRow[@"itemDescription"];
     cell.status = [toDoListRow[@"status"] boolValue];
+    NSDate *deadline = (NSDate *)toDoListRow[@"deadline"];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     
-    cell.showsReorderControl = YES;
+    [dateFormatter setDateStyle:kCFDateFormatterMediumStyle];
+    cell.deadline.text = [dateFormatter stringFromDate:deadline];
   }
   return cell;
 }
@@ -159,25 +141,59 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
   [self.toDoList removeObjectAtIndex:sourceIndexPath.row];
   [self.toDoList insertObject:item atIndex:destinationIndexPath.row];
 }
+//MARK: Data Array methods
+-(void)addItemWithTitle:(NSString *)itemTitle
+         WithDescrition:(NSString *)itemDescription
+           withPriority:(NSString *)priority
+             withStatus:(bool)status
+               withDate:(NSDate *)date{
+  NSMutableDictionary *toDoListRow = [[NSMutableDictionary alloc] init];
+  NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:self.toDoList.count inSection:0];
+  
+  //Add row to to do array
+  [toDoListRow setObject:itemTitle forKey:@"itemTitle"];
+  [toDoListRow setObject:itemDescription forKey:@"itemDescription"];
+  [toDoListRow setObject:priority forKey:@"priorityNumber"];
+  [toDoListRow setObject:[NSNumber numberWithBool:status] forKey:@"status"];
+  [toDoListRow setObject:date forKey:@"deadline"];
+  [self.toDoList addObject:toDoListRow];
+  
+  //Update tablew view
+  [self.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+-(void)completeItem:(NSIndexPath *)indexpath{
+  NSMutableDictionary *toDoItem = (NSMutableDictionary *)self.toDoList[indexpath.row];
+  toDoItem[@"status"] = [NSNumber numberWithInt:YES];
+  
+  [self.tableView reloadData];
+}
+
+//MARK: Gestures
+-(void)swipeToComplete:(UISwipeGestureRecognizer *)recognizer{
+  NSLog(@"swipe registered");
+  
+  CGPoint location = [recognizer locationInView:self.tableView];
+  NSIndexPath *indexSwiped = [self.tableView indexPathForRowAtPoint:location];
+  [self completeItem:indexSwiped];
+  
+  NSLog(@"%@",indexSwiped);
+}
 
 
 //MARK: Segues
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
   
   if ([segue.identifier isEqualToString:@"showDetail"]) {
-    NSMutableDictionary *toDoListRow = [[NSMutableDictionary alloc] init];
-    DetailViewController *destinationVC = [DetailViewController alloc];
-    destinationVC = (DetailViewController *) segue.destinationViewController;
+    DetailViewController *destinationVC = (DetailViewController *) segue.destinationViewController;
     
     //Get the table row selected
     NSIndexPath *indexOfCellSelected = self.tableView.indexPathForSelectedRow;
-    toDoListRow = (NSMutableDictionary *)self.toDoList[indexOfCellSelected.row];
+    NSMutableDictionary *toDoListRow = (NSMutableDictionary *)self.toDoList[indexOfCellSelected.row];
     
     //Set the values that will be displayed in the detail view
     [destinationVC setDetailItem:toDoListRow];
   } else if ([segue.identifier isEqualToString:@"showAdd"]){
-    AddViewController *destinationVC = [AddViewController alloc];
-    destinationVC = (AddViewController *) segue.destinationViewController;
+    AddViewController *destinationVC = (AddViewController *) segue.destinationViewController;
     //Send instance of the VC as the delegate
     destinationVC.delegate = self;
   }

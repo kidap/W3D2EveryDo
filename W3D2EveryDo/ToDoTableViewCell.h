@@ -11,11 +11,10 @@
 @interface ToDoTableViewCell : UITableViewCell
 @property (strong, nonatomic) IBOutlet UILabel *itemTitle;
 @property (strong, nonatomic) IBOutlet UILabel *itemDescription;
-
-
 @property (strong, nonatomic) IBOutlet UILabel *priorityNumber;
 @property (strong, nonatomic) IBOutlet UIImageView *statusImage;
-
 @property (nonatomic,assign) bool status;
+@property (strong, nonatomic) IBOutlet UILabel *deadline;
+
 
 @end
