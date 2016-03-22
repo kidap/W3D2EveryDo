@@ -55,7 +55,7 @@
 }
 -(void)editTapped{
   [self.tableView setEditing:!self.tableView.editing animated:YES];
-  //  [self.tableView set]
+  //Toggle Edit/Done button
   if (self.tableView.editing) {
     [self.navigationItem.leftBarButtonItem setTitle:@"Done"];
   } else{
@@ -71,7 +71,12 @@
 }
 -(void)buildData{
   self.toDoList = [[NSMutableArray alloc] init];
+  NSMutableArray *tmp = [[NSMutableArray alloc] init];
+  [self.toDoList addObject:tmp];
+  NSMutableArray *tmp2 = [[NSMutableArray alloc] init];
+  [self.toDoList addObject:tmp2];
   
+  //Add objects
   [self addItemWithTitle:@"buy milk"
           WithDescrition:@"Chocolate"
             withPriority:@"1"
@@ -92,30 +97,21 @@
 }
 
 //MARK: Table View delegate and data source
--(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath{
-  return YES;
-}
--(void) tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
-  if (editingStyle == UITableViewCellEditingStyleDelete) {
-    [self.toDoList removeObjectAtIndex:indexPath.row];
-    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:YES];
-  } else if(editingStyle == UITableViewCellEditingStyleInsert){
-    
-  }
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+  return self.toDoList.count;
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-  
-  return [self.toDoList count];
+  return [self.toDoList[section] count];
 }
-
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
   NSString *cellIdentifier = @"toDoCell";
   ToDoTableViewCell *cell = (ToDoTableViewCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier
                                                                                  forIndexPath:indexPath];
   if (cell) {
     //Get the actual row item using the index path
-    NSMutableDictionary *toDoListRow = (NSMutableDictionary *)self.toDoList[indexPath.row];
+    NSMutableArray *toDoListGroup = (NSMutableArray *)self.toDoList[indexPath.section];
+    NSMutableDictionary *toDoListRow = (NSMutableDictionary *)toDoListGroup[indexPath.row];
     
     //Set the cell values
     cell.priorityNumber.text = toDoListRow[@"priorityNumber"];
@@ -124,13 +120,23 @@
     cell.status = [toDoListRow[@"status"] boolValue];
     NSDate *deadline = (NSDate *)toDoListRow[@"deadline"];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    
-    [dateFormatter setDateStyle:kCFDateFormatterMediumStyle];
+    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
     cell.deadline.text = [dateFormatter stringFromDate:deadline];
   }
   return cell;
 }
 
+-(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath{
+  return YES;
+}
+-(void) tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
+  if (editingStyle == UITableViewCellEditingStyleDelete) {
+    [self.toDoList removeObjectAtIndex:indexPath.row];
+    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:YES];
+  } else if(editingStyle == UITableViewCellEditingStyleInsert){
+    //do nothing
+  }
+}
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath{
   return YES;
 }
@@ -148,7 +154,10 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
              withStatus:(bool)status
                withDate:(NSDate *)date{
   NSMutableDictionary *toDoListRow = [[NSMutableDictionary alloc] init];
-  NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:self.toDoList.count inSection:0];
+  
+  //Get current count of not completed todos
+  NSInteger currentToDoCount = [self.toDoList[0] count];
+  NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:currentToDoCount inSection:0];
   
   //Add row to to do array
   [toDoListRow setObject:itemTitle forKey:@"itemTitle"];
@@ -156,16 +165,40 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
   [toDoListRow setObject:priority forKey:@"priorityNumber"];
   [toDoListRow setObject:[NSNumber numberWithBool:status] forKey:@"status"];
   [toDoListRow setObject:date forKey:@"deadline"];
-  [self.toDoList addObject:toDoListRow];
+  
+  //If the array is initial, initialize first
+  NSMutableArray *notCompletedArray = self.toDoList[0];//[NSMutableArray alloc];
+  notCompletedArray = self.toDoList[0];
+  [notCompletedArray addObject:toDoListRow];
   
   //Update tablew view
   [self.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 -(void)completeItem:(NSIndexPath *)indexpath{
-  NSMutableDictionary *toDoItem = (NSMutableDictionary *)self.toDoList[indexpath.row];
+  NSMutableArray *notCompleted = self.toDoList[indexpath.section];
+  NSMutableDictionary *toDoItem = (NSMutableDictionary *)notCompleted[indexpath.row];
   toDoItem[@"status"] = [NSNumber numberWithInt:YES];
   
+  
+  //If the array is initial, initialize first
+  NSMutableArray *completedArray = self.toDoList[1];
+  [completedArray addObject:toDoItem];
+  
+  [notCompleted removeObject:toDoItem];
   [self.tableView reloadData];
+}
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+  switch (section) {
+    case 0:
+      return @"Not completed";
+      break;
+    case 1:
+      return @"Completed";
+      break;
+    default:
+      return @"";
+      break;
+  }
 }
 
 //MARK: Gestures
@@ -188,7 +221,7 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
     
     //Get the table row selected
     NSIndexPath *indexOfCellSelected = self.tableView.indexPathForSelectedRow;
-    NSMutableDictionary *toDoListRow = (NSMutableDictionary *)self.toDoList[indexOfCellSelected.row];
+    NSMutableDictionary *toDoListRow = (NSMutableDictionary *)self.toDoList[indexOfCellSelected.section][indexOfCellSelected.row];
     
     //Set the values that will be displayed in the detail view
     [destinationVC setDetailItem:toDoListRow];
