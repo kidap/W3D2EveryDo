@@ -35,10 +35,11 @@
 -(void)setStatus:(bool)status{
   if (status) {
     [_statusImage setImage:[UIImage imageNamed:@"checkImage"]];
-    //Strike itemTitle and itemDescription
+    //Strike labels
     [self strikeText:self.itemTitle];
     [self strikeText:self.itemDescription];
     [self strikeText:self.priorityNumber];
+    [self strikeText:self.deadline];
     
     
   } else{

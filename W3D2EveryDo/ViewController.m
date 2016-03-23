@@ -127,11 +127,12 @@
     cell.priorityNumber.text = toDoListRow[@"priorityNumber"];
     cell.itemTitle.text = toDoListRow[@"itemTitle"];
     cell.itemDescription.text = toDoListRow[@"itemDescription"];
-    cell.status = [toDoListRow[@"status"] boolValue];
     NSDate *deadline = (NSDate *)toDoListRow[@"deadline"];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
     cell.deadline.text = [dateFormatter stringFromDate:deadline];
+    //Set status last to cross out all the label
+    cell.status = [toDoListRow[@"status"] boolValue];
   }
   return cell;
 }
@@ -175,8 +176,8 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
   [toDoListRow setObject:itemTitle forKey:@"itemTitle"];
   [toDoListRow setObject:itemDescription forKey:@"itemDescription"];
   [toDoListRow setObject:priority forKey:@"priorityNumber"];
-  [toDoListRow setObject:[NSNumber numberWithBool:status] forKey:@"status"];
   [toDoListRow setObject:date forKey:@"deadline"];
+  [toDoListRow setObject:[NSNumber numberWithBool:status] forKey:@"status"];
   
   //If the array is initial, initialize first
   NSMutableArray *notCompletedArray = self.toDoList[0];//[NSMutableArray alloc];
