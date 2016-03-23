@@ -44,7 +44,7 @@
 }
 
 -(void)addUIElements{
-
+  
   //Edit button
   self.navigationItem.leftBarButtonItem  = self.editButtonItem;
   self.editButtonItem.target = self;
@@ -55,7 +55,7 @@
   [self.sortingSegmentedControl setUserInteractionEnabled:YES];
   [self.sortingSegmentedControl addTarget:self action:@selector(sortTable:) forControlEvents:UIControlEventValueChanged];
   self.navigationItem.titleView = self.sortingSegmentedControl;
-
+  
   
   //Add button
   UIBarButtonItem *addButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
@@ -192,11 +192,16 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
   toDoItem[@"status"] = [NSNumber numberWithInt:YES];
   
   
-  //If the array is initial, initialize first
+  //Add to completed
   NSMutableArray *completedArray = self.toDoList[1];
+  NSIndexPath * newIndexPath = [NSIndexPath indexPathForItem:completedArray.count inSection:1];
   [completedArray addObject:toDoItem];
+  [self.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:YES];
   
+  //Delete from not completed
   [notCompleted removeObject:toDoItem];
+  [self.tableView deleteRowsAtIndexPaths:@[indexpath] withRowAnimation:YES];
+  
   [self.tableView reloadData];
 }
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
@@ -244,8 +249,9 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
   
   CGPoint location = [recognizer locationInView:self.tableView];
   NSIndexPath *indexSwiped = [self.tableView indexPathForRowAtPoint:location];
-  [self completeItem:indexSwiped];
-  
+  if(indexSwiped.section != 1){
+    [self completeItem:indexSwiped];
+  }
   NSLog(@"%@",indexSwiped);
 }
 
