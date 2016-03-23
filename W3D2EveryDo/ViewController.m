@@ -11,7 +11,7 @@
 #import "DetailViewController.h"
 #import "AddViewController.h"
 
-@interface ViewController ()<UITableViewDataSource, UITableViewDelegate,UIToolbarDelegate>
+@interface ViewController ()<UITableViewDataSource, UITableViewDelegate,UIToolbarDelegate,ToDoListDelegate>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *toDoList;
 @property (strong, nonatomic) UISegmentedControl *sortingSegmentedControl;

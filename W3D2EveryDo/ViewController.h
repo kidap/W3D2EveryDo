@@ -8,15 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol ToDoListDelegate <NSObject>
-
--(void)addItemWithTitle:(NSString *)itemTitle
-         WithDescrition:(NSString *)itemDescription
-           withPriority:(NSString *)priority
-             withStatus:(bool)status
-               withDate:(NSDate *)date;
-
-@end
 @interface ViewController : UIViewController
 
 
