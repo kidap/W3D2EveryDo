@@ -50,7 +50,7 @@
   self.editButtonItem.target = self;
   self.editButtonItem.action = @selector(editTapped);
   
-//  //Sorting options
+  //Sorting options
   self.sortingSegmentedControl = [[UISegmentedControl alloc] initWithItems:@[@"Importance",@"Urgency"]];
   [self.sortingSegmentedControl setUserInteractionEnabled:YES];
   [self.sortingSegmentedControl addTarget:self action:@selector(sortTable:) forControlEvents:UIControlEventValueChanged];
@@ -141,7 +141,8 @@
 }
 -(void) tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
   if (editingStyle == UITableViewCellEditingStyleDelete) {
-    [self.toDoList removeObjectAtIndex:indexPath.row];
+    NSMutableArray *currentSection = (NSMutableArray *)self.toDoList[indexPath.section];
+    [currentSection removeObjectAtIndex:indexPath.row];
     [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:YES];
   } else if(editingStyle == UITableViewCellEditingStyleInsert){
     //do nothing
@@ -228,7 +229,12 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
       break;
   }
   NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-  self.toDoList[0] = [self.toDoList[0] sortedArrayUsingDescriptors:sortDescriptors];
+  //Sort not completed
+  self.toDoList[0] = [[self.toDoList[0] sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
+  //Sort completed
+  self.toDoList[1] = [[self.toDoList[1] sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
+  
+  
   [self.tableView reloadData];
 }
 

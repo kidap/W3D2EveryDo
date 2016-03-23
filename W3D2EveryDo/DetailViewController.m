@@ -14,6 +14,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *priorityNumber;
 @property (strong, nonatomic) IBOutlet UIImageView *imageView;
 @property (nonatomic,assign) bool status;
+@property (strong, nonatomic) IBOutlet UILabel *deadline;
 
 @end
 
@@ -39,6 +40,7 @@
     self.itemTitle.text = self.detailItem[@"itemTitle"];
     self.itemDescription.text = self.detailItem[@"itemDescription"];
     self.status = self.detailItem[@"status"];
+    self.deadline =self.detailItem[@"deadline"];
     
   }
 }
