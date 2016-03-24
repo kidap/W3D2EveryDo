@@ -133,6 +133,9 @@
     cell.deadline.text = [dateFormatter stringFromDate:deadline];
     //Set status last to cross out all the label
     cell.status = [toDoListRow[@"status"] boolValue];
+    if ([toDoListRow[@"status"] boolValue]){
+      cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    }
   }
   return cell;
 }

@@ -34,7 +34,7 @@
 }
 -(void)setStatus:(bool)status{
   if (status) {
-    [_statusImage setImage:[UIImage imageNamed:@"checkImage"]];
+//    [_statusImage setImage:[UIImage imageNamed:@"checkImage"]];
     //Strike labels
     [self strikeText:self.itemTitle];
     [self strikeText:self.itemDescription];
@@ -43,7 +43,7 @@
     
     
   } else{
-    [_statusImage setImage:[[UIImage alloc] init]];
+//    [_statusImage setImage:[[UIImage alloc] init]];
   }
 }
 -(void)strikeText:(UILabel *)label{
