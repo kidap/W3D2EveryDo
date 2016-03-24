@@ -19,6 +19,6 @@
 @end
 @interface AddViewController : UIViewController
 
-@property (weak, nonatomic) id delegate;
+@property (weak, nonatomic) id<ToDoListDelegate> delegate;
 
 @end
